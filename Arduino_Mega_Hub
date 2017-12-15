@@ -1,0 +1,315 @@
+/************************************************************
+* The Purpose of this sketch is to act as the physical hub 
+* for low cost arduino sensors and controllers, to communicate with an MQTT 
+* server hosted on our local Raspberry Pi.
+* Process of the Code
+* - Connect to Network over Ethernet
+* - Control the function of a 1-, 2-, 4-, 8-, 16- channel Relay
+* - Communicate with a MQTT Server on the same network
+* -----------------------------------------------------------
+* Future Inclusions:
+* - Temp / Humidity Sensor
+* - PID Motion Sensor
+* - Gas Sensor
+* - Water Temperature
+* - Light Level Sensor
+* - Contact Sensor (Door / Window)
+*************************************************************/
+/************************************************************
+* Libraries                                                 *
+*************************************************************/
+ #include <SPI.h>
+ #include <Ethernet.h>
+ #include <PubSubClient.h>
+ #include <DHT.h>
+
+/*************************************************************
+ * Ethernet Definitions
+ *************************************************************/
+// Update these with values suitable for your network.
+
+//This will be the MAC address of our Arduino on the network
+byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
+
+//Arduino Ethernet Static IP
+IPAddress ip(192, 168, 5, 105);
+
+EthernetClient ethClient;
+
+/**************************************************************
+ * MQTT Section                                               *
+ **************************************************************/
+//IP Address of your MQTT Broker
+IPAddress server(192, 168, 5, 110);
+
+PubSubClient client(ethClient);
+
+/*************************************************************
+ * Relay Section                                             *
+ *************************************************************/
+//Digital Pins to connect to relay control 
+const int relay1 = 22;
+const int relay2 = 23;
+const int relay3 = 24;
+const int relay4 = 25;
+const int relay5 = 26;
+const int relay6 = 27;
+const int relay7 = 28;
+const int relay8 = 29;
+const int relay9 = 30;
+const int relay10 = 31;
+const int relay11 = 32;
+const int relay12 = 33;
+const int relay13 = 34;
+const int relay14 = 35;
+const int relay15 = 36;
+const int relay16 = 37;
+
+/*************************************************************
+* Temperature / Humidity Section
+**************************************************************/
+#define DHTPIN 7
+#define DHTTYPE DHT22
+
+DHT dht(DHTPIN, DHTTYPE);
+
+int chk;
+float hum;
+float temp;
+
+/*************************************************************
+ * User Defined Functions Section
+ *************************************************************/
+void callback(char* topic, byte* payload, unsigned int length);
+void reconnect();
+void readTemps();
+  
+
+/****************************************************************************
+ * Sketch Setup Section                                                     *
+ ****************************************************************************/
+void setup() 
+{
+  // put your setup code here, to run once:
+
+  Serial.begin(57600);
+  while(!Serial)
+    {
+      ;//Wait for Serial
+    }
+
+  Serial.println("Welcome to Rojowe's Mega Hub");
+  Serial.println("Please wait while Setup finishes...");
+
+  Serial.println("Setting Ethernet connection...");
+  
+  Ethernet.begin(mac, ip);
+  //Allow the hardware a moment to connect  
+  Serial.print("connecting...");
+  delay(1500);
+
+  client.setServer(server, 1883);
+  client.setCallback(callback);
+
+  pinMode(relay1, OUTPUT);
+  pinMode(relay2, OUTPUT);
+  pinMode(relay3, OUTPUT);
+  pinMode(relay4, OUTPUT);
+  pinMode(relay5, OUTPUT);
+  pinMode(relay6, OUTPUT);
+  pinMode(relay7, OUTPUT);
+  pinMode(relay8, OUTPUT);
+  
+
+  digitalWrite(relay1, HIGH);
+  digitalWrite(relay2, HIGH);
+  digitalWrite(relay3, HIGH);
+  digitalWrite(relay4, HIGH);
+  digitalWrite(relay5, HIGH);
+  digitalWrite(relay6, HIGH);
+  digitalWrite(relay7, HIGH);
+  digitalWrite(relay8, HIGH);
+
+  dht.begin();
+}
+
+/*************************************************************************************************
+ * Sketch Loop Section                                                                           *
+ *************************************************************************************************/
+void loop() 
+{
+  // put your main code here, to run repeatedly:
+  if (!client.connected())
+    {
+      Serial.println();
+      Serial.println("Connecting to MQTT server...");
+      reconnect();
+    }
+  client.loop();
+  
+  //2 Second delay between temperature readings
+  while(millis.now() - millisLast >= 2000)
+  {
+    readTemps();
+  }
+}
+/***************************************************************************************************/
+/*************************************************************
+ * User Defined Functions Section
+ *************************************************************/
+void callback(char* topic, byte* payload, unsigned int length) 
+{  
+  Serial.print(topic);
+  Serial.print(" ");
+    
+  for (int i = 0; i < length; i++) 
+  {
+    Serial.print((char)payload[i]);
+  
+    if (strcmp(topic,"mega_hub/relay1")==0)
+    {
+      if((char)payload[0] == '0')
+      {
+        digitalWrite(relay1, HIGH);
+      }
+      else if((char)payload[0] == '1')
+      {
+        digitalWrite(relay1, LOW);
+      }
+      Serial.println();
+    }
+    else if(strcmp(topic,"mega_hub/relay2")==0)
+    {
+      if((char)payload[0] == '0')
+      {
+        digitalWrite(relay2, HIGH);
+      }
+      else if((char)payload[0] == '1')
+      {
+        digitalWrite(relay2, LOW);
+      }
+      Serial.println();
+    }
+    else if(strcmp(topic,"mega_hub/relay3")==0)
+    {
+      if((char)payload[0] == '0')
+      {
+        digitalWrite(relay3, HIGH);
+      }
+      else if((char)payload[0] == '1')
+      {
+        digitalWrite(relay3, LOW);
+      }
+      Serial.println();
+    }
+    else if(strcmp(topic,"mega_hub/relay4")==0)
+    {
+      if((char)payload[0] == '0')
+      {
+        digitalWrite(relay4, HIGH);
+      }
+      else if((char)payload[0] == '1')
+      {
+        digitalWrite(relay4, LOW);
+      }
+      Serial.println();
+    }
+    if (strcmp(topic,"mega_hub/relay5")==0)
+    {
+      if((char)payload[0] == '0')
+      {
+        digitalWrite(relay5, HIGH);
+      }
+      else if((char)payload[0] == '1')
+      {
+        digitalWrite(relay5, LOW);
+      }
+      Serial.println();
+    }
+    else if(strcmp(topic,"mega_hub/relay6")==0)
+    {
+      if((char)payload[0] == '0')
+      {
+        digitalWrite(relay6, HIGH);
+      }
+      else if((char)payload[0] == '1')
+      {
+        digitalWrite(relay6, LOW);
+      }
+      Serial.println();
+    }
+    else if(strcmp(topic,"mega_hub/relay7")==0)
+    {
+      if((char)payload[0] == '0')
+      {
+        digitalWrite(relay7, HIGH);
+      }
+      else if((char)payload[0] == '1')
+      {
+        digitalWrite(relay7, LOW);
+      }
+      Serial.println();
+    }
+    else if(strcmp(topic,"mega_hub/relay8")==0)
+    {
+      if((char)payload[0] == '0')
+      {
+        digitalWrite(relay8, HIGH);
+      }
+      else if((char)payload[0] == '1')
+      {
+        digitalWrite(relay8, LOW);
+      }
+      Serial.println();
+    }
+  }
+}
+
+
+void reconnect() 
+{
+  // Loop until we're reconnected
+  while (!client.connected()) 
+  {
+    // Attempt to connect
+    if (client.connect("arduinoClient")) 
+    {
+      Serial.println("connected");
+      // Once connected, publish an announcement...
+      client.publish("openhab2","hello world");
+      // ... and resubscribe
+      client.subscribe("mega_hub/relay1");
+      client.subscribe("mega_hub/relay2");
+      client.subscribe("mega_hub/relay3");
+      client.subscribe("mega_hub/relay4");
+      client.subscribe("mega_hub/relay5");
+      client.subscribe("mega_hub/relay6");
+      client.subscribe("mega_hub/relay7");
+      client.subscribe("mega_hub/relay8");
+    } 
+    else 
+    {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }
+  }   
+}
+
+void readTemps()
+{
+  //Read data and store it to variables hum and temp
+  hum = dht.readHumidity();
+  temp= dht.readTemperature();
+  
+  /* Needs To Be Changed To Work with MQTT */
+  
+  //Print temp and humidity values to serial monitor
+  Serial.print("Humidity: ");
+  Serial.print(hum);
+  Serial.print(" %, Temp: ");
+  Serial.print(temp);
+  Serial.println(" Celsius");
+}
