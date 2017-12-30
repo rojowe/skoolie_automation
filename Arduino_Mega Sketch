@@ -86,17 +86,18 @@ const int relay12 = 34;
 const int relay13 = 35;
 const int relay14 = 36;
 const int relay15 = 37;
+const int relay16 = 38;
 
 /*************************************************************
 * Temperature / Humidity Section
 **************************************************************/
-const int dht1 = 38; //Engine Bay
-const int dht2 = 39; //Driver Area
-const int dht3 = 40; //Kitchen Area
-const int dht4 = 41; //Bathroom 
-const int dht5 = 42; //Bedroom 
-const int dht6 = 43; //Garage
-const int dht7 = 44; //External DHT
+const int dht1 = 39; //Engine Bay
+const int dht2 = 40; //Driver Area
+const int dht3 = 41; //Kitchen Area
+const int dht4 = 42; //Bathroom 
+const int dht5 = 43; //Bedroom 
+const int dht6 = 44; //Garage
+const int dht7 = 45; //External DHT
 
 /*************************************************************
  * User Defined Functions Section
@@ -146,17 +147,36 @@ void setup()
   pinMode(relay12, OUTPUT);
   pinMode(relay13, OUTPUT);
   pinMode(relay14, OUTPUT);
-  pinMode(relay15, OUTPUT); 
+  pinMode(relay15, OUTPUT);
+  pinMode(relay16, OUTPUT);
+  
 
-  digitalWrite(relay1, HIGH);
-  digitalWrite(relay2, HIGH);
-  digitalWrite(relay3, HIGH);
-  digitalWrite(relay4, HIGH);
-  digitalWrite(relay5, HIGH);
-  digitalWrite(relay6, HIGH);
-  digitalWrite(relay7, HIGH);
-  digitalWrite(relay8, HIGH);
+  digitalWrite(relay1, LOW);
+  digitalWrite(relay2, LOW);
+  digitalWrite(relay3, LOW);
+  digitalWrite(relay4, LOW);
+  digitalWrite(relay5, LOW);
+  digitalWrite(relay6, LOW);
+  digitalWrite(relay7, LOW);
+  digitalWrite(relay8, LOW);
+  digitalWrite(relay9, LOW);
+  digitalWrite(relay10, LOW);
+  digitalWrite(relay11, LOW);
+  digitalWrite(relay12, LOW);
+  digitalWrite(relay13, LOW);
+  digitalWrite(relay14, LOW);
+  digitalWrite(relay15, LOW);
+  digitalWrite(relay16, LOW);
 
+  digitalWrite(e_light, LOW);
+  digitalWrite(d_light, LOW);
+  digitalWrite(lr_light, LOW);
+  digitalWrite(k_light, LOW);
+  digitalWrite(b_light, LOW);
+  digitalWrite(br_light, LOW);
+  digitalWrite(g_light, LOW);
+  digitalWrite(ex_light, LOW);
+  
   dht.begin();
 }
 
