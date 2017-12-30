@@ -11,7 +11,7 @@
 
 <h3>Features</h3>
 <ul>
-  <li>Power Systems</li>
+  <li>Power Systems Monitoring</li>
   <ul>
     <li>Solar Panel Tracking (When Stationary)</li>
     <li>Solar Panel Output Voltage</li>
@@ -25,6 +25,7 @@
     <li>Battery Time-to-Danger</li>
   </ul>
   <li>Lighting</li>
+  <p>RGB LED Control</p>
   <ul>
     <li>Engine Area</li>
     <li>Driver Area</li>
