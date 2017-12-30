@@ -7,10 +7,11 @@
 
 <p>
   Well, what does that mean...let's start with the battery, and the required solar charging unit. Then we can discuss controlling our skoolie.
-  </p>
+</p>
 
 <h3>Features</h3>
 <ul>
+  <li>Amazon Alexa Integration</li>
   <li>Power Systems Monitoring</li>
   <ul>
     <li>Solar Panel Tracking (When Stationary)</li>
@@ -24,8 +25,7 @@
     <li>Battery Time-to-Low</li>
     <li>Battery Time-to-Danger</li>
   </ul>
-  <li>Lighting</li>
-  <p>RGB LED Control</p>
+  <li>Lighting - RGB LED Strips for 90% of our lighting</li>
   <ul>
     <li>Engine Area</li>
     <li>Driver Area</li>
