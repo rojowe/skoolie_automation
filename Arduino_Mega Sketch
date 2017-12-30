@@ -48,15 +48,14 @@ PubSubClient client(ethClient);
  * Relay Section                                             *
  *************************************************************/
 //Digital Pins to connect to relay control 
-const int relay1 = 22;
-const int relay2 = 23;
-const int relay3 = 24;
-const int relay4 = 25;
-const int relay5 = 26;
-const int relay6 = 27;
-const int relay7 = 28;
-const int relay8 = 29;
-const int relay9 = 30;
+const int fresh_pump = 23;
+const int grey_pump = 24;
+const int hot_water_power = 25;
+const int fridge = 26;
+const int aircon = 27;
+const int heater = 28;
+const int main_TV = 29;
+const int br_TV = 30;
 const int relay10 = 31;
 const int relay11 = 32;
 const int relay12 = 33;
@@ -66,8 +65,40 @@ const int relay15 = 36;
 const int relay16 = 37;
 
 /*************************************************************
+ * Lighting Section                                          *
+ *************************************************************/
+const int lr_r = 2;
+const int lr_g = 3;
+const int lr_b = 4;
+const int k_r = 5;
+const int k_g = 6;
+const int k_b = 7;
+const int br_r = 8;
+const int br_g = 9;
+const int br_b = 10;
+
+const int eng_light = 15;
+const int driver_light = 16;
+const int lr_light = 17;
+const int k_light = 18;
+const int bath_light = 19;
+const int br_light = 20;
+const int garage_light = 21;
+const int ext_light = 22;
+
+
+/*************************************************************
 * Temperature / Humidity Section
 **************************************************************/
+const int eng_dht = 23;
+const int driver_dht = 24;
+const int lr_dht = 25;
+const int k_dht = 26;
+const int bath_dht = 27;
+const int br_dht = 28;
+const int garage_dht = 29;
+const int ext_dht = 30;
+
 #define DHTPIN 7
 #define DHTTYPE DHT22
 
