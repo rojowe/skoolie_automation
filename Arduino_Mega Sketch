@@ -45,68 +45,58 @@ IPAddress server(192, 168, 5, 110);
 PubSubClient client(ethClient);
 
 /*************************************************************
+ * Lighting Section                                          *
+ *************************************************************/
+const int lr_r = 2;  //Living Room Red
+const int lr_g = 3;  //Living Room Green
+const int lr_b = 4;  //Living Room Blue
+const int k_r = 5;   //Kitchen Red
+const int k_g = 6;   //Kitchen Green
+const int k_b = 7;   //Kitchen Blue
+const int br_r = 8;  //Bedroom Red
+const int br_g = 9;  //Bedroom Green
+const int br_b = 10; //Bedroom Blue
+
+const int e_light = 15;  //Engine Light (On/Off)
+const int d_light = 16;  //Driver Area Light (On/Off)
+const int lr_light = 17; //living Area Light (On/Off)
+const int k_light = 18;  //Kitchen Light (On/Off)
+const int b_light = 19;  //Bathroom light (On/Off)
+const int br_light = 20; //Bedroom Light (On/Off)
+const int g_light = 21;  //Garage Light (On/Off)
+const int ex_light = 22; //Exterior Lighting (On/Off)
+
+
+/*************************************************************
  * Relay Section                                             *
  *************************************************************/
 //Digital Pins to connect to relay control 
-const int fresh_pump = 23;
-const int grey_pump = 24;
-const int hot_water_power = 25;
-const int fridge = 26;
-const int aircon = 27;
-const int heater = 28;
-const int main_TV = 29;
-const int br_TV = 30;
-const int relay10 = 31;
-const int relay11 = 32;
-const int relay12 = 33;
-const int relay13 = 34;
-const int relay14 = 35;
-const int relay15 = 36;
-const int relay16 = 37;
-
-/*************************************************************
- * Lighting Section                                          *
- *************************************************************/
-const int lr_r = 2;
-const int lr_g = 3;
-const int lr_b = 4;
-const int k_r = 5;
-const int k_g = 6;
-const int k_b = 7;
-const int br_r = 8;
-const int br_g = 9;
-const int br_b = 10;
-
-const int eng_light = 15;
-const int driver_light = 16;
-const int lr_light = 17;
-const int k_light = 18;
-const int bath_light = 19;
-const int br_light = 20;
-const int garage_light = 21;
-const int ext_light = 22;
-
+const int relay1 = 23; //Fresh Water Pump
+const int relay2 = 24; //Grey Water Pump
+const int relay3 = 25; //Hot Water Heater (On/Off)
+const int relay4 = 26; //Fridge
+const int relay5 = 27; //Air Conditioner
+const int relay6 = 28; //Heater
+const int relay7 = 29; //Living Room TV
+const int relay8 = 30; //Bedroom TV
+const int relay9 = 31;
+const int relay10 = 32;
+const int relay11 = 33;
+const int relay12 = 34;
+const int relay13 = 35;
+const int relay14 = 36;
+const int relay15 = 37;
 
 /*************************************************************
 * Temperature / Humidity Section
 **************************************************************/
-const int eng_dht = 23;
-const int driver_dht = 24;
-const int lr_dht = 25;
-const int k_dht = 26;
-const int bath_dht = 27;
-const int br_dht = 28;
-const int garage_dht = 29;
-const int ext_dht = 30;
-
-#define DHTPIN 7
-#define DHTTYPE DHT22
-
-DHT dht(DHTPIN, DHTTYPE);
-
-int chk;
-float hum;
-float temp;
+const int dht1 = 38; //Engine Bay
+const int dht2 = 39; //Driver Area
+const int dht3 = 40; //Kitchen Area
+const int dht4 = 41; //Bathroom 
+const int dht5 = 42; //Bedroom 
+const int dht6 = 43; //Garage
+const int dht7 = 44; //External DHT
 
 /*************************************************************
  * User Defined Functions Section
@@ -150,7 +140,13 @@ void setup()
   pinMode(relay6, OUTPUT);
   pinMode(relay7, OUTPUT);
   pinMode(relay8, OUTPUT);
-  
+  pinMode(relay9, OUTPUT);
+  pinMode(relay10, OUTPUT);
+  pinMode(relay11, OUTPUT);
+  pinMode(relay12, OUTPUT);
+  pinMode(relay13, OUTPUT);
+  pinMode(relay14, OUTPUT);
+  pinMode(relay15, OUTPUT); 
 
   digitalWrite(relay1, HIGH);
   digitalWrite(relay2, HIGH);
