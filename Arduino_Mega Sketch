@@ -7,13 +7,6 @@
 * - Control the function of a 1-, 2-, 4-, 8-, 16- channel Relay
 * - Communicate with a MQTT Server on the same network
 * -----------------------------------------------------------
-* Future Inclusions:
-* - Temp / Humidity Sensor
-* - PID Motion Sensor
-* - Gas Sensor
-* - Water Temperature
-* - Light Level Sensor
-* - Contact Sensor (Door / Window)
 *************************************************************/
 /************************************************************
 * Libraries                                                 *
