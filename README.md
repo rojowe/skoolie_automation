@@ -36,7 +36,7 @@
     <li>Garage Area</li>
     <li>UnderCarriage Area</li>
   </ul>
-  <li>HVAC</li>
+  <li>HVAC - to go anywhere, we need heating and cooling</li>
   <ul>
     <li>HVAC Controlls</li>
     <li>Engine Temp/Humidity</li>
@@ -48,7 +48,7 @@
     <li>Garage Temp/Humidity</li>
     <li>UnderCarriage Temp/Humidity</li>
   </ul>
-  <li>Plumbing</li>
+  <li>Plumbing - we'd like SOME luxury in our limited space</li>
   <ul>
     <li>Fresh Water Volume</li>
     <li>Fresh Water Temp</li>
@@ -60,7 +60,13 @@
     <li>Grey Water Pump Power</li>
   </ul>
   <li>Appliances</li>
-  <li>
+  <ul>
+    <li>Refridgerator</li>
+    <li>Air Conditioner</li>
+    <li>Heater</li>
+    <li>Main TV</li>
+    <li>Bedroom TV</li>
+  </ul>
 </ul>
 
 <p>The list really could go on and on, and I look forward to updating as we complete this project.</p>
