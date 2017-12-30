@@ -98,6 +98,7 @@ const int dht7 = 45; //External DHT
 void callback(char* topic, byte* payload, unsigned int length);
 void reconnect();
 void readTemps();
+void colorSelect();
   
 
 /****************************************************************************
@@ -166,7 +167,8 @@ void setup()
   digitalWrite(lr_light, LOW);
   digitalWrite(k_light, LOW);
   digitalWrite(b_light, LOW);
-  digitalWrite(br_light, LOW);
+  digitalWrite
+(br_light, LOW);
   digitalWrite(g_light, LOW);
   digitalWrite(ex_light, LOW);
   
@@ -353,3 +355,20 @@ void readTemps()
   Serial.print(temp);
   Serial.println(" Celsius");
 }
+
+void colorSelect()
+{
+ //Pass mqtt message
+ 
+ long colorVal = strtol(payload, NULL, 16);
+ 
+ analogWrite(lr_r, (colorVal&0xff0000)>>16 );
+ analogWrite(lr_g, (colorVal&0x00ff00)>>8 );
+ analogWrite(lr_b, (colorVal&0x0000ff)>>0 );
+
+ //ie: mosquitto_pub -h <mqtt_server> -t rgb_light -m "ff0000" # ALL red
+ //                                                -m "00ff00" # ALL green
+ //                                                -m "0000ff" # ALL blue
+}
+
+
