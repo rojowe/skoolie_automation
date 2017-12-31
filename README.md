@@ -5,10 +5,6 @@
   Because Home Automation. I want to automate an Off-Grid System
 </p>
 
-<p>
-  Well, what does that mean...let's start with the battery, and the required solar charging unit. Then we can discuss controlling our skoolie.
-</p>
-
 <h3>Features</h3>
 <ul>
   <li>Amazon Alexa Integration</li>
