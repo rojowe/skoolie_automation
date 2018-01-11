@@ -1,54 +1,46 @@
-File belongs in this directory
-/etc/openhab2/items/home.items
+//This is the file for Home Items
 
-//This is the file for Skoolie Items
-
-//Syntax
 //itemtype itemname "labeltext [stateformat]" <iconname> (group1, ...) [tag1, ...] {bindingconfig}
 
-//Exterior
-Switch EXT_relay1 "Exterior Lighting" (all) ["Switchable"] {mqtt=">[broker:exterior/relay1:command:OFF:0], >[broker:exterior/relay1:command:ON:1]"}
-Switch EXT_relay2 "Under Lighting"    (all) ["Switchable"] {mqtt=">[broker:exterior/relay2:command:OFF:0], >[broker:exterior/relay2:command:ON:1]"}
+//Group Thermostat "Thermostat" ["Thermostat", "Fahrenheit"]
+//Number ThermostatCurrentTemp "Thermostat Temperature" ["Current Temperature"]
+//Number ThermostatTargetTemp "Thermostat Target" ["Target Temperature"]
 
-//Power Systems
-Switch SolarTracking "Solar Tracking" (all) ["Switchable"] {mqtt=">[broker:powerSystems/solarTracking:command:OFF:0], >[broker:powerSystems/solarTracking:command:ON:1]"}
-Switch SolarVoltage "Solar Panel Voltage" (all) ["Switchable"] {mqtt=">[broker:powerSystems/solarPanelVoltage:command:OFF:0], >[broker:powerSystems/solarPanelVoltage:command:ON:1]"}
-Switch ChargeVoltage "Solar Charger Voltage" (all) ["Switchable"] {mqtt=">[broker:powerSystems/chargeVoltage:command:OFF:0], >[broker:powerSystems/chargeVoltage:command:ON:1]"}
-Switch BatteryVoltage "Battery Voltage" (all) ["Switchable"] {mqtt=">[broker:powerSystems/batteryVoltage:command:OFF:0], >[broker:powerSystems/batteryVoltage:command:ON:1]"}
 
-//Lighting
-Switch EngineLight "Engine Bay" (all) ["Switchable"] {mqtt=">[broker:lighting/engine:command:OFF:0], >[broker:lighting/engine:command:ON:1]"}
-//Driver Area\
-//Living Area
-//Kitchen
+//BattleStation
+Switch BS_ledpin "L.E.D. Light"(all) ["Switchable"] {mqtt=">[broker:mega/ledpin:command:OFF:0], >[broker:mega/ledpin:command:ON:1]"} 
+Color  BS_rgb    "Desk"        (all) ["Lighting"]   {mqtt=">[broker:mega/rgb:command:*:default]"}
+Color  BS_rgb2   "Desk L.E.D." (all) ["Lighting"]   {mqtt=">[broker:mega/rgb/alexa:command:*:default]"}
+Switch BS_relay1 "Relay 1"     (all) ["Switchable"] {mqtt=">[broker:mega/relay1:command:OFF:0], >[broker:mega/relay1:command:ON:1]"}
+Switch BS_relay2 "Relay 2"     (all) ["Switchable"] {mqtt=">[broker:mega/relay2:command:OFF:0], >[broker:mega/relay2:command:ON:1]"}
+Switch BS_relay3 "Relay 3"     (all) ["Switchable"] {mqtt=">[broker:mega/relay3:command:OFF:0], >[broker:mega/relay3:command:ON:1]"}
+Switch BS_relay4 "Relay 4"     (all) ["Switchable"] {mqtt=">[broker:mega/relay4:command:OFF:0], >[broker:mega/relay4:command:ON:1]"}
+Switch BS_relay5 "Relay 5"     (all) ["Switchable"] {mqtt=">[broker:mega/relay5:command:OFF:0], >[broker:mega/relay5:command:ON:1]"}
+Switch BS_relay6 "Relay 6"     (all) ["Switchable"] {mqtt=">[broker:mega/relay6:command:OFF:0], >[broker:mega/relay6:command:ON:1]"}
+Switch BS_relay7 "Relay 7"     (all) ["Switchable"] {mqtt=">[broker:mega/relay7:command:OFF:0], >[broker:mega/relay7:command:ON:1]"}
+Switch BS_relay8 "Relay 8"     (all) ["Switchable"] {mqtt=">[broker:mega/relay8:command:OFF:0], >[broker:mega/relay8:command:ON:1]"}
+ 
+
+//Bedroom 
+Switch BR_relay1 "TV"        (all) ["Switchable"] {mqtt=">[broker:livingroom/relay1:command:OFF:0], >[broker:livingroom/relay1:command:ON:1]"}
+Switch BR_relay2 "Fire TV"   (all) ["Switchable"] {mqtt=">[broker:livingroom/relay3:command:OFF:0], >[broker:livingroom/relay3:command:ON:1]"}
+Switch BR_relay3 "Fan"       (all) ["Switchable"] {mqtt=">[broker:livingroom/relay2:command:OFF:0], >[broker:livingroom/relay2:command:ON:1]"}
+Switch BR_relay4 "Fireplace" (all) ["Switchable"] {mqtt=">[broker:livingroom/relay4:command:OFF:0], >[broker:livingroom/relay4:command:ON:1]"}
+
 //Bathroom
-//Bedroom
-//Garage
-//Undercarriage
+//Switch Bath_relay1 "Bathroom Light" (all) ["Switchable"] {mqtt=">[broker:bathroom/relay1:command:OFF:0], >[broker:bathroom/relay1:command:ON:1]"}
 
-//HVAC
-//Engine Bay
-//Driver
-//Living
+//Living Room
+//Switch LR_relay1 "TV"      (all) ["Switchable"] {mqtt=">[broker:livingroom/relay1:command:OFF:0], >[broker:livingroom/relay1:command:ON:1]"}
+//Switch LR_relay2 "Cable"   (all) ["Switchable"] {mqtt=">[broker:livingroom/relay2:command:OFF:0], >[broker:livingroom/relay2:command:ON:1]"}
+//Switch LR_relay3 "Fire TV" (all) ["Switchable"] {mqtt=">[broker:livingroom/relay3:command:OFF:0], >[broker:livingroom/relay3:command:ON:1]"}
+//Switch LR_relay4 "Stereo"  (all) ["Switchable"] {mqtt=">[broker:livingroom/relay4:command:OFF:0], >[broker:livingroom/relay4:command:ON:1]"}
+
 //Kitchen
-//Bathroom
-//Bedroom
-//Garage
-//Undercarriage
+//Switch K_relay1 "Toaster Oven" (all) ["Switchable"] [mqtt=">[broker:kitchen/relay1:command:OFF:0], >[broker:kitchen/relay1:command:ON:1]"}
 
-//Plumbing
-//Fresh Water Volume
-//Fresh Water Temp
-//Grey Water Volume
-//Grey Water Temp
-//Hot Water Heater Power
-//Hot Water Heater Temp
-//Fresh Water Pump Power
-//Grey Water Pump Power
+//Laundry
+//Switch Laundry_relay1 "Laundry Light" (all) ["Switchable"] {mqtt=">[broker:laundry/relay1:command:OFF:0], >[broker:laundry/relay1:command:ON:1]"}
 
-//Appliances
-//Fridge
-//A/C
-//Heater
-//Main TV
-//Bedroom TV
+//Garage/Driveway
+//Switch Garage_relay1 "Garage Light" (all) ["Switchable"] {mqtt=">[broker:garage/relay1:command:OFF:0], >[broker:garage/relay1:command:ON:1]"}
