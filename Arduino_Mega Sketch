@@ -1,132 +1,129 @@
-/************************************************************
-* The Purpose of this sketch is to act as the physical hub 
-* for low cost arduino sensors and controllers, to communicate with an MQTT 
-* server hosted on our local Raspberry Pi.
-* Process of the Code
-* - Connect to Network over Ethernet
-* - Control the function of a 1-, 2-, 4-, 8-, 16- channel Relay
-* - Communicate with a MQTT Server on the same network
-* -----------------------------------------------------------
-*************************************************************/
-/************************************************************
-* Libraries                                                 *
-*************************************************************/
- #include <SPI.h>
- #include <Ethernet.h>
- #include <PubSubClient.h>
- #include <DHT.h>
+/************************************************
+ *  Libraries                                   *
+ ************************************************/
+#include <SPI.h>
+#include <Ethernet.h>
+#include <PubSubClient.h>
 
-/*************************************************************
- * Ethernet Definitions
- *************************************************************/
-// Update these with values suitable for your network.
-
-//This will be the MAC address of our Arduino on the network
-byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
-
-//Arduino Ethernet Static IP
-IPAddress ip(192, 168, 5, 105);
-
+/************************************************
+ * Ethernet                                     *
+ ************************************************/
+//User can define their own mac address
+byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
+//User needs to choice a static IP address
+IPAddress ip(192, 168, 5, 120);
+//Do not change 
 EthernetClient ethClient;
 
-/**************************************************************
- * MQTT Section                                               *
- **************************************************************/
-//IP Address of your MQTT Broker
+/*************************************************
+ *  MQTT                                         *
+ *************************************************/
+//MQTT Server IP address
 IPAddress server(192, 168, 5, 110);
-
+//Do not change
 PubSubClient client(ethClient);
 
-/*************************************************************
- * Lighting Section                                          *
- *************************************************************/
-const int lr_r = 2;  //Living Room Red
-const int lr_g = 3;  //Living Room Green
-const int lr_b = 4;  //Living Room Blue
-const int k_r = 5;   //Kitchen Red
-const int k_g = 6;   //Kitchen Green
-const int k_b = 7;   //Kitchen Blue
-const int br_r = 8;  //Bedroom Red
-const int br_g = 9;  //Bedroom Green
-const int br_b = 10; //Bedroom Blue
+/*************************************************
+ *  Relays                                       *
+ *************************************************/
+//Arduino Mega on-board LED 
+int ledpin = 13;
+int ledstate = LOW;
+//Relay Digital IO Pins
+int relay1 = 22;
+int relay2 = 23;
+int relay3 = 24;
+int relay4 = 25;
+int relay5 = 26;
+int relay6 = 27;
+int relay7 = 28;
+int relay8 = 29;
 
-const int e_light = 15;  //Engine Light (On/Off)
-const int d_light = 16;  //Driver Area Light (On/Off)
-const int lr_light = 17; //living Area Light (On/Off)
-const int k_light = 18;  //Kitchen Light (On/Off)
-const int b_light = 19;  //Bathroom light (On/Off)
-const int br_light = 20; //Bedroom Light (On/Off)
-const int g_light = 21;  //Garage Light (On/Off)
-const int ex_light = 22; //Exterior Lighting (On/Off)
+/*************************************************
+ * LED Lighting                                  * 
+ *************************************************/
+ int rgb_r = 44;
+ int rgb_g = 45;
+ int rgb_b = 46;
 
+ int hue;
+ int saturation;
+ int brightness;
 
-/*************************************************************
- * Relay Section                                             *
- *************************************************************/
-//Digital Pins to connect to relay control 
-const int relay1 = 23; //Fresh Water Pump
-const int relay2 = 24; //Grey Water Pump
-const int relay3 = 25; //Hot Water Heater (On/Off)
-const int relay4 = 26; //Fridge
-const int relay5 = 27; //Air Conditioner
-const int relay6 = 28; //Heater
-const int relay7 = 29; //Living Room TV
-const int relay8 = 30; //Bedroom TV
-const int relay9 = 31;
-const int relay10 = 32;
-const int relay11 = 33;
-const int relay12 = 34;
-const int relay13 = 35;
-const int relay14 = 36;
-const int relay15 = 37;
-const int relay16 = 38;
+ int hue_a;
+ float saturation_a;
+ float brightness_a;
+ 
+ int fadeVal = 0;
+ int fadeSpeed = 4;
 
-/*************************************************************
-* Temperature / Humidity Section
-**************************************************************/
-const int dht1 = 39; //Engine Bay
-const int dht2 = 40; //Driver Area
-const int dht3 = 41; //Kitchen Area
-const int dht4 = 42; //Bathroom 
-const int dht5 = 43; //Bedroom 
-const int dht6 = 44; //Garage
-const int dht7 = 45; //External DHT
+ int base;
+ int r;
+ int g;
+ int b;
 
-/*************************************************************
- * User Defined Functions Section
- *************************************************************/
-void callback(char* topic, byte* payload, unsigned int length);
+ int soffitR;
+ int soffitG;
+ int soffitB;
+
+ const byte dim_curve[] = {
+    0,   1,   1,   2,   2,   2,   2,   2,   2,   3,   3,   3,   3,   3,   3,   3,
+    3,   3,   3,   3,   3,   3,   3,   4,   4,   4,   4,   4,   4,   4,   4,   4,
+    4,   4,   4,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   6,   6,   6,
+    6,   6,   6,   6,   6,   7,   7,   7,   7,   7,   7,   7,   8,   8,   8,   8,
+    8,   8,   9,   9,   9,   9,   9,   9,   10,  10,  10,  10,  10,  11,  11,  11,
+    11,  11,  12,  12,  12,  12,  12,  13,  13,  13,  13,  14,  14,  14,  14,  15,
+    15,  15,  16,  16,  16,  16,  17,  17,  17,  18,  18,  18,  19,  19,  19,  20,
+    20,  20,  21,  21,  22,  22,  22,  23,  23,  24,  24,  25,  25,  25,  26,  26,
+    27,  27,  28,  28,  29,  29,  30,  30,  31,  32,  32,  33,  33,  34,  35,  35,
+    36,  36,  37,  38,  38,  39,  40,  40,  41,  42,  43,  43,  44,  45,  46,  47,
+    48,  48,  49,  50,  51,  52,  53,  54,  55,  56,  57,  58,  59,  60,  61,  62,
+    63,  64,  65,  66,  68,  69,  70,  71,  73,  74,  75,  76,  78,  79,  81,  82,
+    83,  85,  86,  88,  90,  91,  93,  94,  96,  98,  99,  101, 103, 105, 107, 109,
+    110, 112, 114, 116, 118, 121, 123, 125, 127, 129, 132, 134, 136, 139, 141, 144,
+    146, 149, 151, 154, 157, 159, 162, 165, 168, 171, 174, 177, 180, 183, 186, 190,
+    193, 196, 200, 203, 207, 211, 214, 218, 222, 226, 230, 234, 238, 242, 248, 255,
+};
+
+/*************************************************************************************
+ * Temp Sensors                                                                      *
+ *************************************************************************************/
+long prevMillis = 0;
+long interval = 2000;
+
+/*************************************************************************************
+ *  User Defined Functions                                                           *
+ *************************************************************************************/
+void startupLED();
 void reconnect();
-void readTemps();
-void colorSelect();
-  
+void callback(char* topic, byte* payload, unsigned int length);
+void tempRead();
+void hsb2RGB(int hu, int sat, int bright);
+void hsb2RGB_a(int hu_a, float sat_a, float bright_a);
+void ledControl(int rgbr, int rgbg, int rgbb, int brightness);
 
-/****************************************************************************
- * Sketch Setup Section                                                     *
- ****************************************************************************/
+/*************************************************************************************
+ *  SETUP LOOP                                                                       *
+ *************************************************************************************/
 void setup() 
 {
-  // put your setup code here, to run once:
-
   Serial.begin(57600);
-  while(!Serial)
-    {
-      ;//Wait for Serial
-    }
-
-  Serial.println("Welcome to Rojowe's Mega Hub");
-  Serial.println("Please wait while Setup finishes...");
-
-  Serial.println("Setting Ethernet connection...");
-  
+  Serial.println("Hello World!");
+  Serial.println("Welcome to Rojowe's Off Grid Home Automation!");
+  Serial.println();
+  Serial.println("Beginning System Initialization...");
+  delay(500);
+  Serial.println("Serial Connected!");
+  delay(500);
+  Serial.print("Ethernet Connecting...");
   Ethernet.begin(mac, ip);
-  //Allow the hardware a moment to connect  
-  Serial.print("connecting...");
-  delay(1500);
-
+  Serial.println(ip);
+  delay(2000);
   client.setServer(server, 1883);
   client.setCallback(callback);
-
+  delay(500);
+  Serial.println("Establishing pinMode(s)...");
+  pinMode(ledpin, OUTPUT);
   pinMode(relay1, OUTPUT);
   pinMode(relay2, OUTPUT);
   pinMode(relay3, OUTPUT);
@@ -135,80 +132,133 @@ void setup()
   pinMode(relay6, OUTPUT);
   pinMode(relay7, OUTPUT);
   pinMode(relay8, OUTPUT);
-  pinMode(relay9, OUTPUT);
-  pinMode(relay10, OUTPUT);
-  pinMode(relay11, OUTPUT);
-  pinMode(relay12, OUTPUT);
-  pinMode(relay13, OUTPUT);
-  pinMode(relay14, OUTPUT);
-  pinMode(relay15, OUTPUT);
-  pinMode(relay16, OUTPUT);
-  
+  pinMode(rgb_r, OUTPUT);
+  pinMode(rgb_g, OUTPUT);
+  pinMode(rgb_b, OUTPUT);
 
-  digitalWrite(relay1, LOW);
-  digitalWrite(relay2, LOW);
-  digitalWrite(relay3, LOW);
-  digitalWrite(relay4, LOW);
-  digitalWrite(relay5, LOW);
-  digitalWrite(relay6, LOW);
-  digitalWrite(relay7, LOW);
-  digitalWrite(relay8, LOW);
-  digitalWrite(relay9, LOW);
-  digitalWrite(relay10, LOW);
-  digitalWrite(relay11, LOW);
-  digitalWrite(relay12, LOW);
-  digitalWrite(relay13, LOW);
-  digitalWrite(relay14, LOW);
-  digitalWrite(relay15, LOW);
-  digitalWrite(relay16, LOW);
+  Serial.println("Configuring digital IO...");
+  digitalWrite(ledpin, LOW);
+  digitalWrite(relay1, HIGH);
+  digitalWrite(relay2, HIGH);
+  digitalWrite(relay3, HIGH);
+  digitalWrite(relay4, HIGH);
+  digitalWrite(relay5, HIGH);
+  digitalWrite(relay6, HIGH);
+  digitalWrite(relay7, HIGH);
+  digitalWrite(relay8, HIGH);
 
-  digitalWrite(e_light, LOW);
-  digitalWrite(d_light, LOW);
-  digitalWrite(lr_light, LOW);
-  digitalWrite(k_light, LOW);
-  digitalWrite(b_light, LOW);
-  digitalWrite
-(br_light, LOW);
-  digitalWrite(g_light, LOW);
-  digitalWrite(ex_light, LOW);
-  
-  dht.begin();
+  //Turn On LED Lights
+  startupLED(); 
+
+  Serial.println("Setup Finished!");
 }
 
-/*************************************************************************************************
- * Sketch Loop Section                                                                           *
- *************************************************************************************************/
+/***********************************************************************************
+ *  MAIN LOOP                                                                      *
+ ***********************************************************************************/
 void loop() 
 {
-  // put your main code here, to run repeatedly:
   if (!client.connected())
-    {
-      Serial.println();
-      Serial.println("Connecting to MQTT server...");
-      reconnect();
-    }
-  client.loop();
-  
-  //2 Second delay between temperature readings
-  while(millis.now() - millisLast >= 2000)
   {
-    readTemps();
+    Serial.println();
+    Serial.println("Connecting to MQTT Server...");
+    reconnect();
+  }
+
+  tempRead();
+  client.loop();
+}
+
+/**********************************************************************************
+ *  USER DEFINED FUNCTIONS                                                        *
+ **********************************************************************************/
+void startupLED()
+{
+  analogWrite(rgb_r, 255);
+  analogWrite(rgb_g, 0);
+  analogWrite(rgb_b, 0);
+  delay(250);
+  analogWrite(rgb_r, 255);
+  analogWrite(rgb_g, 255);
+  analogWrite(rgb_b, 0);
+  delay(250);
+  analogWrite(rgb_r, 0);
+  analogWrite(rgb_g, 255);
+  analogWrite(rgb_b, 0);
+  delay(250);
+  analogWrite(rgb_r, 0);
+  analogWrite(rgb_g, 255);
+  analogWrite(rgb_b, 255);
+  delay(250);
+  analogWrite(rgb_r, 0);
+  analogWrite(rgb_g, 0);
+  analogWrite(rgb_b, 255);
+  delay(250);
+  analogWrite(rgb_r, 255);
+  analogWrite(rgb_g, 0);
+  analogWrite(rgb_b, 255);
+  delay(250);
+  analogWrite(rgb_r, 255);
+  analogWrite(rgb_g, 255);
+  analogWrite(rgb_b, 255);
+}
+
+/****************************************************************/
+void reconnect()
+{
+  while(!client.connected())
+  {
+    if(client.connect("arduinoClient"))
+    {
+      Serial.println("Connected!");
+      
+      //MQTT Topic Published 
+      client.publish("status/mega", "Doing Fine!");
+      
+      //MQTT Topic Subscriptions
+      client.subscribe("mega/ledpin");
+      client.subscribe("mega/relay1");
+      client.subscribe("mega/relay2");
+      client.subscribe("mega/relay3");
+      client.subscribe("mega/relay4");
+      client.subscribe("mega/relay5");
+      client.subscribe("mega/relay6");
+      client.subscribe("mega/relay7");
+      client.subscribe("mega/relay8");
+      client.subscribe("mega/rgb");
+      client.subscribe("mega/rgb/alexa");
+    }
+    else
+    {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println("trying again in 5 seconds...");
+      delay(5000);
+    }
   }
 }
-/***************************************************************************************************/
-/*************************************************************
- * User Defined Functions Section
- *************************************************************/
-void callback(char* topic, byte* payload, unsigned int length) 
-{  
+
+/***********************************************************************************/
+void callback(char* topic, byte* payload, unsigned int length)
+{
   Serial.print(topic);
   Serial.print(" ");
-    
-  for (int i = 0; i < length; i++) 
+
+  for (int i=0; i< length; i++)
   {
-    Serial.print((char)payload[i]);
-  
-    if (strcmp(topic,"mega_hub/relay1")==0)
+    if (strcmp(topic, "mega/ledpin") == 0)
+    {
+      if((char)payload[0] == '0')
+      {
+        digitalWrite(ledpin, LOW);
+      }
+      else if((char)payload[0] == '1')
+      {
+        digitalWrite(ledpin, HIGH);
+      }
+      Serial.println();
+    }
+    else if (strcmp(topic, "mega/relay1") == 0)
     {
       if((char)payload[0] == '0')
       {
@@ -220,7 +270,7 @@ void callback(char* topic, byte* payload, unsigned int length)
       }
       Serial.println();
     }
-    else if(strcmp(topic,"mega_hub/relay2")==0)
+    else if (strcmp(topic, "mega/relay2") == 0)
     {
       if((char)payload[0] == '0')
       {
@@ -232,7 +282,7 @@ void callback(char* topic, byte* payload, unsigned int length)
       }
       Serial.println();
     }
-    else if(strcmp(topic,"mega_hub/relay3")==0)
+    else if (strcmp(topic, "mega/relay3") == 0)
     {
       if((char)payload[0] == '0')
       {
@@ -244,7 +294,7 @@ void callback(char* topic, byte* payload, unsigned int length)
       }
       Serial.println();
     }
-    else if(strcmp(topic,"mega_hub/relay4")==0)
+    else if (strcmp(topic, "mega/relay4") == 0)
     {
       if((char)payload[0] == '0')
       {
@@ -256,7 +306,7 @@ void callback(char* topic, byte* payload, unsigned int length)
       }
       Serial.println();
     }
-    if (strcmp(topic,"mega_hub/relay5")==0)
+    else if (strcmp(topic, "mega/relay5") == 0)
     {
       if((char)payload[0] == '0')
       {
@@ -268,7 +318,7 @@ void callback(char* topic, byte* payload, unsigned int length)
       }
       Serial.println();
     }
-    else if(strcmp(topic,"mega_hub/relay6")==0)
+    else if (strcmp(topic, "mega/relay6") == 0)
     {
       if((char)payload[0] == '0')
       {
@@ -280,7 +330,7 @@ void callback(char* topic, byte* payload, unsigned int length)
       }
       Serial.println();
     }
-    else if(strcmp(topic,"mega_hub/relay7")==0)
+    else if (strcmp(topic, "mega/relay7") == 0)
     {
       if((char)payload[0] == '0')
       {
@@ -292,7 +342,7 @@ void callback(char* topic, byte* payload, unsigned int length)
       }
       Serial.println();
     }
-    else if(strcmp(topic,"mega_hub/relay8")==0)
+    else if (strcmp(topic, "mega/relay8") == 0)
     {
       if((char)payload[0] == '0')
       {
@@ -304,71 +354,309 @@ void callback(char* topic, byte* payload, unsigned int length)
       }
       Serial.println();
     }
+    else if (strcmp(topic, "mega/rgb") == 0)
+    {
+      String value = String((char*)payload);
+
+      //Dividing the HSB Values from MQTT (each value is separated by a comma
+      hue = value.substring(0,value.indexOf(',')).toInt();
+      saturation = value.substring(value.indexOf(',')+1,value.lastIndexOf(',')).toInt();
+      brightness = value.substring(value.lastIndexOf(',')+1).toInt();
+
+      //Ensuring the values stay within our limits
+      hue = constrain(hue, 0, 360);
+      saturation = constrain(saturation, 0, 100);
+      brightness = constrain(brightness, 0, 100);
+
+      //Print the values as recieved by MQTT
+      Serial.println();
+      Serial.print("MQQT H: ");
+      Serial.print(hue);
+      Serial.print(" S: ");
+      Serial.print(saturation);
+      Serial.print(" B: ");
+      Serial.print(brightness);
+      Serial.println();
+
+      //Mapping the 0-100 values to 0-255 -- should be moved to within hsb2rgb ... same mods for alexa
+      saturation = map(saturation, 0, 100, 255, 0);
+      brightness = map(brightness, 0, 100, 0, 255);
+
+      //Ensure the values stay within our limits
+      saturation = constrain(saturation, 0, 255);
+      brightness = constrain(brightness, 0, 255);
+
+      //Convert our HSB values to RGB
+      hsb2RGB(hue, saturation, brightness);
+    }
+    else if (strcmp(topic, "mega/rgb/alexa") == 0)
+    {
+      String value = String((char*)payload);
+
+      //Alexa sends RGB values as a string xxx,xxx,xxx & when setting brightness, a string value of 0 - 100 
+      //I need to find a way to detect that only 1 value was sent, ie: Sat_a && Bright_a don't exist, 
+      //then convert the value to an int and pass it to led control as brightness
+      //if(value >= 0 && value <= 100)
+      //{
+          //brightness = value(converted to an Int);
+
+          //ledBrightness(brightness);
+          
+       //}else
+       //{
+       //
+        hue_a = value.substring(0,value.indexOf(',')).toInt();
+        saturation_a = value.substring(value.indexOf(',')+1,value.lastIndexOf(',')).toInt();
+        brightness_a = value.substring(value.lastIndexOf(',')+1).toInt();
+
+        //
+        hue_a = constrain(hue_a, 1, 360);
+        saturation_a = constrain(saturation_a, 0.0, 1.0);
+        brightness_a = constrain(brightness_a, 0.0, 1.0);
+
+        //
+        Serial.print("MQTT_H_a: ");
+        Serial.print(hue_a);
+        Serial.print(" MQTT_S_a: ");
+        Serial.print(saturation_a);
+        Serial.print(" MQTT_B_a: ");
+        Serial.println(brightness_a);
+
+        //
+        hsb2RGB_a(hue_a, saturation_a, brightness_a);
+      }
+    }
+  }
+//}
+
+/***********************************************************************************/
+void hsb2RGB(int hu, int sat, int bright)
+{
+  //brightness = dim_curve[brightness];
+  //saturation = 255 - dim_curve[255 - saturation];
+
+  //Serial.println("Hue: ");
+  //Serial.print(hu);
+  //Serial.print(" Sat: ");
+  //Serial.print(sat);
+  //Serial.print(" Bright: ");
+  //Serial.println(bright);
+
+  if (saturation == 0)
+  {
+    r = brightness;
+    g = brightness;
+    b = brightness;
+  }
+  else
+  {
+    base = ((255 - saturation) * brightness) >> 8;
+
+    switch(hue/60)
+    {
+      case 0:
+        r = brightness;
+        g = (((brightness - base) * hue) / 60) + base;
+        b = base;
+      break;
+
+      case 1:
+        r = (((brightness - base) * (60 - (hue % 60 ))) / 60) + base;
+        g = brightness;
+        b = base;
+      break;
+
+      case 2:
+        r = base;
+        g = brightness;
+        b = (((brightness - base) * (hue % 60)) / 60) + base;
+      break;
+
+      case 3:
+        r = base;
+        g = (((brightness - base) * (60-(hue%60)))/60)+base;
+        b = brightness;
+      break;
+
+      case 4:
+        r = (((brightness - base) * (hue % 60)) / 60) + base;
+        g = base;
+        b = brightness;
+      break;
+
+      case 5:
+        r = brightness;
+        g = base;
+        b = (((brightness - base) * (60 - (hue % 60))) / 60) +base;
+      break;
+    }
+
+    r = constrain(r, 0, 255);
+    g = constrain(g, 0, 255);
+    b = constrain(b, 0, 255);
+
+    Serial.print("Red: ");
+    Serial.print(r);
+    Serial.print(" Green: ");
+    Serial.print(g);
+    Serial.print(" Blue: ");
+    Serial.println(b);
+  }
+
+    soffitR = map(r, 0, 16, 0, 255);
+    soffitG = map(g, 0, 16, 0, 255);
+    soffitB = map(b, 0, 16, 0, 255);
+
+    soffitR = constrain(soffitR, 0, 255);
+    soffitG = constrain(soffitG, 0, 255);
+    soffitB = constrain(soffitB, 0, 255);
+
+    Serial.print("soffitR: ");
+    Serial.print(soffitR);
+    Serial.print(" soffitG: ");
+    Serial.print(soffitG);
+    Serial.print(" soffitB: ");
+    Serial.println(soffitB);
+
+    ledControl(soffitR, soffitG, soffitB, 100);
+}
+
+/****************************************************************/
+void hsb2RGB_a(int hu_a,float sat_a, float bright_a)
+{
+  //brightness = dim_curve[brightness];
+  //saturation = 255 - dim_curve[255 - saturation];
+  
+  //Serial.print("Hue: ");
+  //Serial.print(hu_a);
+  //Serial.print(" Sat: ");
+  //Serial.print(sat_a);
+  //Serial.print(" Bright: ");
+  //Serial.println(bright_a);
+
+  int sat = sat_a * 255;
+  int bright = bright_a * 255;
+  
+
+  if (sat == 0)
+  {
+    r = bright;
+    g = bright;
+    b = bright;
+  }
+  else
+  {
+    base = ((255 - sat) * bright) >> 8;
+
+    switch(hu_a/60)
+    {
+      case 0:
+        r = bright;
+        g = (((bright - base) * hu_a) / 60) + base;
+        b = base;
+      break;
+
+      case 1:
+        r = (((bright - base) * (60 - (hu_a % 60 ))) / 60) + base;
+        g = bright;
+        b = base;
+      break;
+
+      case 2:
+        r = base;
+        g = bright;
+        b = (((bright - base) * (hu_a % 60)) / 60) + base;
+      break;
+
+      case 3:
+        r = base;
+        g = (((bright - base) * (60 - (hu_a % 60))) / 60) + base;
+        b = bright;
+      break;
+
+      case 4:
+        r = (((bright - base) * (hu_a % 60)) / 60) + base;
+        g = base;
+        b = bright;
+      break;
+
+      case 5:
+        r = bright;
+        g = base;
+        b = (((bright - base) * (60 - (hu_a % 60))) / 60) + base;
+      break;
+    }
+  }
+
+    r = constrain(r, 0, 255);
+    g = constrain(g, 0, 255);
+    b = constrain(b, 0, 255);
+
+    Serial.print("Red: ");
+    Serial.print(r);
+    Serial.print(" Green: ");
+    Serial.print(g);
+    Serial.print(" Blue: ");
+    Serial.println(b);
+
+    soffitR = r;
+    soffitG = g;
+    soffitB = b;
+
+    soffitR = constrain(soffitR, 0, 255);
+    soffitG = constrain(soffitG, 0, 255);
+    soffitB = constrain(soffitB, 0, 255);
+
+    Serial.print("soffitR: ");
+    Serial.print(soffitR);
+    Serial.print(" soffitG: ");
+    Serial.print(soffitG);
+    Serial.print(" soffitB: ");
+    Serial.println(soffitB);
+
+    ledControl(soffitR, soffitG, soffitB, 100);
+}
+
+/*****************************************************************************/
+void ledControl(int rgbr, int rgbg, int rgbb, int brightness)
+{
+  if(brightness != 100)
+  {
+    Serial.println("Brightness != 100%");
+    int rgbr_b = (brightness / 100) * rgbr;
+    int rgbg_b = (brightness / 100) * rgbg;
+    int rgbb_b = (brightness / 100) * rgbb;
+
+    analogWrite(rgb_r, rgbr_b);
+    analogWrite(rgb_g, rgbg_b);
+    analogWrite(rgb_b, rgbb_b);    
+  
+  }
+  else
+  {
+    analogWrite(rgb_r, rgbr);
+    analogWrite(rgb_g, rgbg);
+    analogWrite(rgb_b, rgbb);
   }
 }
 
-
-void reconnect() 
+/*****************************************************************/
+void tempRead()
 {
-  // Loop until we're reconnected
-  while (!client.connected()) 
+  unsigned long currentMillis = millis();
+  if(currentMillis - prevMillis > interval)
   {
-    // Attempt to connect
-    if (client.connect("arduinoClient")) 
+    prevMillis = currentMillis;
+      
+    if(ledstate == LOW)
     {
-      Serial.println("connected");
-      // Once connected, publish an announcement...
-      client.publish("openhab2","hello world");
-      // ... and resubscribe
-      client.subscribe("mega_hub/relay1");
-      client.subscribe("mega_hub/relay2");
-      client.subscribe("mega_hub/relay3");
-      client.subscribe("mega_hub/relay4");
-      client.subscribe("mega_hub/relay5");
-      client.subscribe("mega_hub/relay6");
-      client.subscribe("mega_hub/relay7");
-      client.subscribe("mega_hub/relay8");
-    } 
-    else 
-    {
-      Serial.print("failed, rc=");
-      Serial.print(client.state());
-      Serial.println(" try again in 5 seconds");
-      // Wait 5 seconds before retrying
-      delay(5000);
+      ledstate = HIGH;
+      digitalWrite(ledpin, ledstate);
     }
-  }   
+    else
+    {
+      ledstate = LOW;
+      digitalWrite(ledpin, ledstate); 
+    }
+  }
 }
-
-void readTemps()
-{
-  //Read data and store it to variables hum and temp
-  hum = dht.readHumidity();
-  temp= dht.readTemperature();
-  
-  /* Needs To Be Changed To Work with MQTT */
-  
-  //Print temp and humidity values to serial monitor
-  Serial.print("Humidity: ");
-  Serial.print(hum);
-  Serial.print(" %, Temp: ");
-  Serial.print(temp);
-  Serial.println(" Celsius");
-}
-
-void colorSelect()
-{
- //Pass mqtt message
- 
- long colorVal = strtol(payload, NULL, 16);
- 
- analogWrite(lr_r, (colorVal&0xff0000)>>16 );
- analogWrite(lr_g, (colorVal&0x00ff00)>>8 );
- analogWrite(lr_b, (colorVal&0x0000ff)>>0 );
-
- //ie: mosquitto_pub -h <mqtt_server> -t rgb_light -m "ff0000" # ALL red
- //                                                -m "00ff00" # ALL green
- //                                                -m "0000ff" # ALL blue
-}
-
-
