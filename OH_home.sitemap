@@ -1,0 +1,26 @@
+//This will be the Home Sitemap
+
+sitemap home label="Main Menu"
+{
+	Frame label="BattleStation"
+	{
+		Switch      item=BS_ledpin label="L.E.D. Light" icon="light"
+		Colorpicker item=BS_rgb    label="Desk"      icon="colorwheel"
+		Switch      item=BS_relay1 label="Relay 1" //icon="?"
+		Switch      item=BS_relay2 label="Relay 2" //icon="?"
+		Switch      item=BS_relay3 label="Relay 3" //icon="?"
+		Switch      item=BS_relay4 label="Relay 4" //icon="?"
+		Switch      item=BS_relay5 label="Relay 5" //icon="?"
+		Switch      item=BS_relay6 label="Relay 6" //icon="?"
+		Switch      item=BS_relay7 label="Relay 7" //icon="?"
+		Switch      item=BS_relay8 label="Relay 8" //icon="?"
+	}
+
+	Frame label="Bedroom"
+	{
+		Switch item=BR_relay1 label="TV"
+		Switch item=BR_relay3 label="Fire TV"
+		Switch item=BR_relay2 label="Fan"
+		Switch item=BR_relay4 label="Fireplace"
+	}
+}
