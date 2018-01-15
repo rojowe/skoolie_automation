@@ -1,0 +1,6 @@
+Sectional Zones
+PID Tuning
+- If the controller is attempting to heat a zone, yet, the zones temperature does not rise, 
+perhaps there is a problem at the physical level. Send an alarm value to alert the user of a potential problem. 
+There will be other sensors monitoring other environmental factors that will be able to work together to create a complete 
+picture of the internal environment. 
