@@ -27,6 +27,7 @@
     <li>Battery Time-to-Danger</li>
   </ul>
   <li>Lighting - RGB LED Strips for 90% of our lighting</li>
+  <li>Working!!! (Optional) Alexa -> (starting) OH2 -> MQTT -> Arduino -> RGB LED</li>
   <ul>
     <li>Engine Area</li>
     <li>Driver Area</li>
@@ -61,6 +62,7 @@
     <li>Grey Water Pump Power</li>
   </ul>
   <li>Appliances</li>
+  <li>Working!!! (optional) Alexa -> OH2 -> MQTT -> Arduino -> Relay (on/off)</li>
   <ul>
     <li>Refridgerator</li>
     <li>Air Conditioner</li>
