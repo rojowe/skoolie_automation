@@ -2,7 +2,12 @@
 
 <h3>Why?</h3>
 <p>
-  Because Home Automation. I want to automate an Off-Grid System
+  Because I want to automate an Off-Grid System.
+</p>
+
+<h3>How?</h3>
+<p>
+  Using a Raspberry Pi 3 and an Arduino Mega, combined with sensors and relays. 
 </p>
 
 <h3>Features</h3>
